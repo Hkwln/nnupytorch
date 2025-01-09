@@ -20,3 +20,5 @@ class SimpleNN(torch.nn.Module):
         y3 = torch.sigmoid(self.layer3(y2))
         
         return y3
+    
+#weiter bei aufgabe 7
