@@ -27,6 +27,13 @@ print(chars)
 # Create a mapping from characters to integers
 char_to_int ={char: i for i, char in enumerate(chars)}
 int_to_char = {i: char for i, char in enumerate(chars)}
-encode = np.array([char_to_int[char] for char in all_text], dtype=np.uint8)
+encode = lambda s: [char_to_int[c] for c in s]
+decode = lambda a: ''.join([int_to_char[i] for i in a])
 
-print(encode("Guten Morgen"))
+#preparing the data for the model
+data = torch.tensor(encode(all_text), dtype=torch.int64)
+n = 0,85*len(data) # 85% of the data is used for training, rest for testing
+train_data = data[n:]
+test_data = data[:n]
+
+#now I need to do the nnupytorch repository first, to get into using torch more
