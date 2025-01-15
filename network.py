@@ -20,5 +20,7 @@ class SimpleNN(torch.nn.Module):
         y3 = torch.sigmoid(self.layer3(y2))
         
         return y3
-    
-#weiter bei aufgabe 7
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(torch.cuda.is_available())
+print(f"Using device: {device}")
+loss_func = torch.nn.BCELoss()
