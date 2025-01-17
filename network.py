@@ -18,7 +18,7 @@ class SimpleNN(torch.nn.Module):
         # define the forward pass
         y1 = torch.relu(self.layer1(x))
         y2 = torch.sigmoid(self.layer2(y1))
-        y3 = self.layer3(y2)
+        y3 = self.sigmoid(self.layer3(y2))
         
         return y3  
 
@@ -38,4 +38,3 @@ optim.step()
 y = model(x)
 loss = loss_func(y, y_hat)
 print(loss)
-
