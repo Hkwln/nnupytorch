@@ -1,8 +1,9 @@
-from data_visualization2 import tqdm
-import torch
+from tqdm import tqdm
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, Dataset, Subset
-from data_visualization import train_subset
+from torch.utils.data import DataLoader
+from dataset import *
+
+train_data = TwoClassDataset()
 
 class Classifier(torch.nn.Module):
     def __init__(self):
@@ -24,7 +25,7 @@ optim = torch.optim.SGD(params=classy.parameters(), lr=0.01)
 # store epoch metrics
 epoch_accs = []
 epoch_losses = []
-dataloader = DataLoader(dataset=train_subset, batch_size=25, shuffle=True)
+dataloader = DataLoader(dataset=train_data, batch_size=25, shuffle=True)
 
 # epoch loop
 for epoch in tqdm(range(50)):
