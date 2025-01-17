@@ -1,0 +1,6 @@
+<h1> Getting to know pytorch
+
+Here I do simple excercises to get into the torch library
+
+```Python
+impot torch
