@@ -130,3 +130,91 @@ print("simpleTextClassifier\n")
 print(model1(torch.tensor(dataset_train_tokenized["token_ids"][:2])))
 print("RnnTextClassifier\n")
 print(model2(torch.tensor(dataset_train_tokenized["token_ids"][:2])))
+
+#Evaluation
+def compute_accuracy(predictions: torch.tensor, labels: torch.tensor):
+    return torch.sum(torch.argmax(predictions, dim=1) == labels).item() / len(labels)
+
+
+def evaluate_model(model, dataset, loss_fn=None):
+    # Compute the accuracy and optionally the loss of the model on the dataset
+    dataloader = get_dataloader(dataset, batch_size=32)
+    accuracies = []
+    losses = []
+    # We don't need to compute gradients for the evaluation
+    with torch.no_grad():
+        for batch in dataloader:
+            token_ids = batch["token_ids"]
+            labels = batch["label"]
+            predictions = model(token_ids)
+            if loss_fn:
+                loss = loss_fn(predictions, labels)
+                losses.append(loss.item())
+            accuracies.append(compute_accuracy(predictions, labels))
+    return sum(accuracies) / len(accuracies), (
+        (sum(losses) / len(losses)) if loss_fn else None
+    )
+
+dataset_val = sst2["validation"]
+dataset_val_tokenized = prepare_dataset(dataset_val)
+dataset_val_tokenized = dataset_val_tokenized.with_format(
+    columns=["token_ids", "label"]
+)
+accuracy, _ = evaluate_model(model1, dataset_val_tokenized)
+print(f"Accuracy on the validation dataset: {accuracy}")
+#Training
+
+
+loss_fn = torch.nn.CrossEntropyLoss()
+optimizer = torch.nn.SGD(model1.parameter, lr = 1e-3)
+
+losses_train, losses_val = []
+accuracies_train, accuracies_val = []
+
+#compute loss and accuracy on the training model
+accuracy, loss = evaluate_model(model1, dataset_val_tokenized, loss_fn)
+losses_train.append(loss)
+accuracies_train.append(accuracy)
+
+#compute loss and accuracy on the validation set
+
+accuracy, loss = evaluate_model(model1, dataset_val_tokenized, loss_fn)
+losses_val.append(loss)
+accuracies_val.append(accuracy)
+
+NUM_EPOCHS = 10
+
+# A progress bar to visualize the training progress
+pbar = trange(NUM_EPOCHS)
+#Training Loop
+for epoch in pbar:
+    #Do one epoch of training
+    for batch in dataloader_train:
+        token_ids = batch["token_ids"]
+        labels = batch["label"]
+
+        #forward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        # Calculate the loss and accuracy on the training set
+        acc_train, loss_train = evaluate_model(model2, dataset_train_tokenized, loss_fn)
+        accuracies_train.append(acc_train)
+        losses_train.append(loss_train)
+
+        # Evaluate the model on the validation set
+        acc_val, loss_val = evaluate_model(model1, dataset_val_tokenized, loss_fn)
+        accuracies_val.append(acc_val)
+        losses_val.append(loss_val)
+
+        pbar.set_postfix_str(
+            f"Train loss: {losses_train[-1]} - Validation acc: {accuracies_val[-1]}"
+)
+# Visualize the loss and accuracy
+plt.plot(losses_train, color="orange", linestyle="-", label="Train loss")
+plt.plot(losses_val, color="orange", linestyle="--", label="Validation loss")
+plt.plot(accuracies_train, color="steelblue", linestyle="-", label="Train accuracy")
+plt.plot(accuracies_val, color="steelblue", linestyle="--", label="Validation accuracy")
+plt.xlabel("Epoch")
+plt.legend()
+plt.show()
