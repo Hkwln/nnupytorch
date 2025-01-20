@@ -166,8 +166,8 @@ print(f"Accuracy on the validation dataset: {accuracy}")
 
 
 loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.nn.SGD(model1.parameter, lr = 1e-3)
-
+optimizer = torch.optim.SGD(params = model1.parameter(), lr = 1e-3)
+optimizer.step()
 losses_train, losses_val = []
 accuracies_train, accuracies_val = []
 
