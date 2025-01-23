@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from dataset import *
 
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f'Using device: {device}')
+
 train_data = TwoClassDataset()
 
 class Classifier(torch.nn.Module):

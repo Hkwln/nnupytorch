@@ -1,6 +1,9 @@
 from imports import *
 from rnn import RnnTextClassifier
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f'Using device: {device}')
+
 sst2 = load_dataset("stanfordnlp/sst2")
 #dataset structure:
 # three splits: train, validation, test
