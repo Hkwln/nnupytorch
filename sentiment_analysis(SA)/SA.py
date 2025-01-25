@@ -1,13 +1,13 @@
 from imports import *
 from rnn import RnnTextClassifier
-
+# here you can change the device to work on gpu
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}')
 
 sst2 = load_dataset("stanfordnlp/sst2")
 #dataset structure:
 # three splits: train, validation, test
-# each of these has fetures: ['idx', 'sentence', 'label']
+# each of these has features: ['idx', 'sentence', 'label']
 # and the number of the rows num_rows
 dataset_train = sst2["train"]
 # Download the GloVe embeddings
@@ -16,7 +16,7 @@ glove = hf_hub_download("stanfordnlp/glove", "glove.6B.zip")
 with zipfile.ZipFile(glove, "r") as f:
     print(f.namelist())
 
-#There are multiple files with differnt dimensionality ofthe features in the zip archive: 50d,100d,200d,300d
+# There are multiple files with different dimensionality of the features in the zip archive: 50d, 100d, 200d, 300d
 filename = "glove.6B.300d.txt"
 with zipfile.ZipFile(glove, "r") as f:
     for idx, line in enumerate(f.open(filename)):
@@ -69,7 +69,7 @@ dataset_train_tokenized = prepare_dataset(dataset_train)
 
 
 def pad_inputs(batch, keys_to_pad=["token_ids"], padding_value=-1):
-# Pad keys_to_pad to the maximum length in batch
+    # Pad keys_to_pad to the maximum length in batch
     padded_batch = {}
     for key in keys_to_pad:
         # Get maximum length in batch
@@ -109,7 +109,7 @@ for batch in dataloader_train:
     labels = batch["label"]
     break
 
-#here is a simpletextclassifier
+# here is a simple text classifier
 class SimpleTextClassifier(torch.nn.Module):
     def __init__(self, embeddings, hidden_size=128, padding_index=-1):
         super().__init__()
@@ -120,29 +120,29 @@ class SimpleTextClassifier(torch.nn.Module):
         self.output_layer = torch.nn.Linear(hidden_size, 2)
 
     def forward(self, x):
-        x = self.embedding(x)
+        x = self.embedding(x)#.to(device)
         # By summing the embeddings of all tokens in the sequence, we get a bag-of-words vector for each sample input
         x = torch.sum(x, dim=1)
         x = torch.relu(self.layer1(x))
         x = self.output_layer(x)
         return x
-#we can now feed the model into the SimpleTextClassifier, or the Rnntextclassifier
+# we can now feed the model into the SimpleTextClassifier, or the RnnTextClassifier
 model1 = SimpleTextClassifier(embeddings, padding_index=padding_token_id)
-model2 = RnnTextClassifier(embeddings,padding_index=padding_token_id)
+model2 = RnnTextClassifier(embeddings,padding_index=padding_token_id)#.to(device)
 print("simpleTextClassifier\n")
 print(model1(torch.tensor(dataset_train_tokenized["token_ids"][:2])))
 print("RnnTextClassifier\n")
 print(model2(torch.tensor(dataset_train_tokenized["token_ids"][:2])))
 
-#Evaluation
-accuracies = []
-losses = []
 
 def compute_accuracy(predictions: torch.tensor, labels: torch.tensor):
     return torch.sum(torch.argmax(predictions, dim=1) == labels).item() / len(labels)
 
 
 def evaluate_model(model, dataloader, loss_fn=None):
+    
+    accuracies = []
+    losses = []
     # We don't need to compute gradients for the evaluation
     with torch.no_grad():
         for batch in dataloader:
@@ -162,6 +162,7 @@ dataset_val_tokenized = prepare_dataset(dataset_val)
 dataset_val_tokenized = dataset_val_tokenized.with_format(
     columns=["token_ids", "label"]
 )
+val_dataloader = get_dataloader(dataset_val_tokenized, batch_size=32, shuffle=False)
 
 dataset_train = sst2["train"]
 dataset_train_tokenized = prepare_dataset(dataset_train)
@@ -169,37 +170,37 @@ dataset_train_tokenized = dataset_train_tokenized.with_format(
     columns=["token_ids", "label"]
 )
 
-accuracy, _ = evaluate_model(model1, dataset_val_tokenized)
+accuracy, _ = evaluate_model(model2, val_dataloader)
 print(f"Accuracy on the validation dataset: {accuracy}")
 
 # Training
 loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(params=model1.parameters(), lr=1e-3)
+optimizer = torch.optim.SGD(params=model2.parameters(), lr=1e-3)
 losses_train, losses_val = [], []
 accuracies_train, accuracies_val = [], []
 
 NUM_EPOCHS = 10
-train_dataloader = DataLoader(dataset_train_tokenized, batch_size=32, shuffle=True)
+train_dataloader = get_dataloader(dataset_train_tokenized, batch_size=32, shuffle=True)
 
 for epoch in range(NUM_EPOCHS):
-    model1.train()
+    model2.train()
     for batch in train_dataloader:
         token_ids = batch["token_ids"]
         labels = batch["label"]
         
         optimizer.zero_grad()
-        predictions = model1(token_ids)
+        predictions = model2(token_ids)
         loss = loss_fn(predictions, labels)
         loss.backward()
         optimizer.step()
     
     # Compute loss and accuracy on the training set
-    accuracy, loss = evaluate_model(model1, dataset_train_tokenized, loss_fn)
+    accuracy, loss = evaluate_model(model2, train_dataloader, loss_fn)
     losses_train.append(loss)
     accuracies_train.append(accuracy)
     
     # Compute loss and accuracy on the validation set
-    accuracy, loss = evaluate_model(model1, dataset_val_tokenized, loss_fn)
+    accuracy, loss = evaluate_model(model2, val_dataloader, loss_fn)
     losses_val.append(loss)
     accuracies_val.append(accuracy)
 

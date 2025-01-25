@@ -14,15 +14,25 @@ class Classifier(torch.nn.Module):
         super().__init__()
         # define the layers
         self.layer1 = torch.nn.Linear(2,5)
+        self.layer3 = torch.nn.Linear(5, 10)
+        self.layer4 = torch.nn.Linear(10,1000000)
+        self.layer5 = torch.nn.Linear(1000000,200)
+        self.layer6 = torch.nn.Linear(200,10)
+        self.layer7 = torch.nn.Linear(10,5)
         self.layer2 = torch.nn.Linear(5,2)
             
     def forward(self, x):
         # define the forward pass
-        y1 = torch.relu(self.layer1(x))
-        y2 = self.layer2(y1)
+        y1 = torch.relu(self.layer1(x)).to(device)
+        y3 = torch.relu(self.layer3(y1))
+        y4 = torch.relu(self.layer4(y3))
+        y5 = torch.relu(self.layer5(y4))
+        y6 = torch.relu(self.layer6(y5))
+        y7 = torch.relu(self.layer7(y6))
+        y2 = torch.relu(self.layer2(y7))
         return y2
 # instantiate model, loss criterion and optimizer
-classy = Classifier()
+classy = Classifier().to(device)
 loss_func = torch.nn.CrossEntropyLoss()
 optim = torch.optim.SGD(params=classy.parameters(), lr=0.01)
 
@@ -42,6 +52,7 @@ for epoch in tqdm(range(50)):
         optim.zero_grad()
         # access data and labels from batch
         data, gold_labels = batch
+        data, gold_labels = data.to(device), gold_labels.to(device)
         # forward pass
         predictions = classy(data)
         # loss and backward pass
@@ -77,7 +88,7 @@ missclassified_class_a = []
 missclassified_class_b = []
 for i in range(len(test_data)):
     x, label = test_data[i]
-    pred = classy(x)
+    pred = classy(x).to(device)
     probs = torch.softmax(pred, dim=0) # note that the softmax is mathematically not needed since it is a monotonic function
     class_pred = torch.argmax(probs, dim=0)
   
