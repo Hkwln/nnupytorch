@@ -1,5 +1,6 @@
 from ipywidgets import widgets
 from IPython.display import display
+from SA import *
 
 #todo a predict for the provided sentence using our trained model
 #hints:
