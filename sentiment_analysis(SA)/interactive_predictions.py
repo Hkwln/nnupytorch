@@ -1,6 +1,7 @@
 from ipywidgets import widgets
 from IPython.display import display
-from SA import *
+from SA import model2, map_text_to_indices
+import torch
 
 #todo a predict for the provided sentence using our trained model
 #hints:
@@ -14,6 +15,7 @@ sentence_widget = widgets.Text(
     description="Sentence:",
     disabled=False,
 )
+display(sentence_widget)
 def predict_sentence(sentence:str):
     token_ids = map_text_to_indices(sentence)
     token_ids = torch.tensor([token_ids],dtype=torch.long)
@@ -22,7 +24,5 @@ def predict_sentence(sentence:str):
     return predictions
 
 sentence = sentence_widget.value
-predictions = predict_sentence(sentence_widget)
+predictions = predict_sentence(sentence)
 display(predictions)
-# Get the input sentence from the widget
-sentence = sentence_widget.value
