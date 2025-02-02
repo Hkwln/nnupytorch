@@ -1,6 +1,6 @@
 <h1> Getting to know pytorch
 
-Here I do simple excercises to get into the torch library
+Here I do simple excercises to get into pytorch
 
-```Python
-impot torch
+-firstly i created a classification algorithm with only linear layers
+-then I created a sentiment analysis which classifies a text input you write to the terminal
