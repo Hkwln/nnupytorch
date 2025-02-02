@@ -14,6 +14,15 @@ sentence_widget = widgets.Text(
     description="Sentence:",
     disabled=False,
 )
-display(sentence_widget)
+def predict_sentence(sentence:str):
+    token_ids = map_text_to_indices(sentence)
+    token_ids = torch.tensor([token_ids],dtype=torch.long)
+    with torch.no_grad():
+        predictions = model2(sentence)
+    return predictions
+
+sentence = sentence_widget.value
+predictions = predict_sentence(sentence_widget)
+display(predictions)
 # Get the input sentence from the widget
 sentence = sentence_widget.value
