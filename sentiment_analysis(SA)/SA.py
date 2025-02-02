@@ -1,5 +1,5 @@
 from imports import *
-from rnn import RnnTextClassifier
+#from rnn import RnnTextClassifier
 # here you can change the device to work on gpu
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #print(f'Using device: {device}')
@@ -57,7 +57,6 @@ def tokenize(text: str):
     return text.lower().split()
 
 def map_token_to_index(token):
-    # Return the index of the token or the index of the '<unk>' token if the token is not in the vocabulary
     return word_to_index.get(token, unk_token_id)
 
 def map_text_to_indices(text: str):
@@ -103,7 +102,7 @@ def get_dataloader(dataset, batch_size=32, shuffle=False):
 train_dataloader = get_dataloader(dataset_train_tokenized, batch_size=32, shuffle=True)
 val_dataloader = get_dataloader(dataset_val_tokenized, batch_size=32, shuffle=False)
 
-# Define the model
+# Define the model with increased complexity and dropout
 class RnnTextClassifier(torch.nn.Module):
     def __init__(self, embeddings, hidden_size=128, padding_index=-1):
         super().__init__()
@@ -111,12 +110,14 @@ class RnnTextClassifier(torch.nn.Module):
             embeddings, freeze=True, padding_idx=padding_index
         )
         self.layer1 = torch.nn.RNN(embeddings.shape[1], hidden_size, batch_first=True)
+        #self.dropout = torch.nn.Dropout(0.5)
         self.layer2 = torch.nn.Linear(hidden_size, 2)
     
     def forward(self, x):
         x = self.embedding(x)
         _, h_s = self.layer1(x)
         x = torch.relu(h_s[-1])
+        #x = self.dropout(x)
         x = self.layer2(x)
         return x
 
@@ -144,9 +145,9 @@ def evaluate_model(model, dataloader, loss_fn=None):
 def compute_accuracy(predictions: torch.tensor, labels: torch.tensor):
     return torch.sum(torch.argmax(predictions, dim=1) == labels).item() / len(labels)
 
-# Training loop
+# Training loop with adjusted learning rate
 loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(params=model2.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(params=model2.parameters(), lr=1e-4)  # Adjusted learning rate
 losses_train, losses_val = [], []
 accuracies_train, accuracies_val = [], []
 
@@ -167,14 +168,14 @@ for epoch in pbar:
         optimizer.step()
     
     # Compute loss and accuracy on the training set
-    accuracy, loss = evaluate_model(model2, train_dataloader, loss_fn)
-    losses_train.append(loss)
-    accuracies_train.append(accuracy)
+    train_accuracy, train_loss = evaluate_model(model2, train_dataloader, loss_fn)
+    losses_train.append(train_loss)
+    accuracies_train.append(train_accuracy)
     
     # Compute loss and accuracy on the validation set
-    accuracy, loss = evaluate_model(model2, val_dataloader, loss_fn)
-    losses_val.append(loss)
-    accuracies_val.append(accuracy)
+    val_accuracy, val_loss = evaluate_model(model2, val_dataloader, loss_fn)
+    losses_val.append(val_loss)
+    accuracies_val.append(val_accuracy)
 
     pbar.set_postfix_str(
         f"Train loss: {losses_train[-1]} - Validation acc: {accuracies_val[-1]}"

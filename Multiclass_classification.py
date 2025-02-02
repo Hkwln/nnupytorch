@@ -14,27 +14,27 @@ class Classifier(torch.nn.Module):
         super().__init__()
         # define the layers
         self.layer1 = torch.nn.Linear(2,5)
-        self.layer3 = torch.nn.Linear(5, 10)
-        self.layer4 = torch.nn.Linear(10,1000000)
-        self.layer5 = torch.nn.Linear(1000000,200)
-        self.layer6 = torch.nn.Linear(200,10)
-        self.layer7 = torch.nn.Linear(10,5)
+        #self.layer3 = torch.nn.Linear(5, 10)
+        #self.layer4 = torch.nn.Linear(10,1000000)
+        #self.layer5 = torch.nn.Linear(1000000,200)
+        #self.layer6 = torch.nn.Linear(200,10)
+        #self.layer7 = torch.nn.Linear(10,5)
         self.layer2 = torch.nn.Linear(5,2)
             
     def forward(self, x):
         # define the forward pass
-        y1 = torch.relu(self.layer1(x)).to(device)
-        y3 = torch.relu(self.layer3(y1))
-        y4 = torch.relu(self.layer4(y3))
-        y5 = torch.relu(self.layer5(y4))
-        y6 = torch.relu(self.layer6(y5))
-        y7 = torch.relu(self.layer7(y6))
-        y2 = torch.relu(self.layer2(y7))
+        y1 = torch.relu(self.layer1(x))#.to(device)
+        #y3 = torch.relu(self.layer3(y1))
+        #y4 = torch.relu(self.layer4(y3))
+        #y5 = torch.relu(self.layer5(y4))
+        #y6 = torch.relu(self.layer6(y5))
+        #y7 = torch.relu(self.layer7(y6))
+        y2 = torch.relu(self.layer2(y1))
         return y2
 # instantiate model, loss criterion and optimizer
-classy = Classifier().to(device)
+classy = Classifier()#.to(device)
 loss_func = torch.nn.CrossEntropyLoss()
-optim = torch.optim.SGD(params=classy.parameters(), lr=0.01)
+optim = torch.optim.Adam(params=classy.parameters(), lr=0.01)
 
 # store epoch metrics
 epoch_accs = []
@@ -42,7 +42,7 @@ epoch_losses = []
 dataloader = DataLoader(dataset=train_data, batch_size=25, shuffle=True)
 
 # epoch loop
-for epoch in tqdm(range(50)):
+for epoch in tqdm(range(10)):
     epoch_acc = []
     epoch_loss = []
     
@@ -52,7 +52,7 @@ for epoch in tqdm(range(50)):
         optim.zero_grad()
         # access data and labels from batch
         data, gold_labels = batch
-        data, gold_labels = data.to(device), gold_labels.to(device)
+        #data, gold_labels = data.to(device), gold_labels.to(device)
         # forward pass
         predictions = classy(data)
         # loss and backward pass
@@ -88,7 +88,7 @@ missclassified_class_a = []
 missclassified_class_b = []
 for i in range(len(test_data)):
     x, label = test_data[i]
-    pred = classy(x).to(device)
+    pred = classy(x)#.to(device)
     probs = torch.softmax(pred, dim=0) # note that the softmax is mathematically not needed since it is a monotonic function
     class_pred = torch.argmax(probs, dim=0)
   
@@ -102,7 +102,7 @@ for i in range(len(test_data)):
             predicted_class_a.append(x.unsqueeze(dim=0))
         else:
             predicted_class_b.append(x.unsqueeze(dim=0))
-predicted_class_a = torch.cat(predicted_class_a, dim=0) # concatenates tensor along specified, existing dimension, does not create new dimension
+predicted_class_a = torch.cat(predicted_class_a, dim=0) # concatenates tefnsor along specified, existing dimension, does not create new dimension
 predicted_class_b = torch.cat(predicted_class_b, dim=0) # `stack` is an alternative which creates a new dimension (i.e. we wouldn't have `unsqueeze`d the vectors)
 missclassified_class_a = torch.cat(missclassified_class_a, dim=0)
 missclassified_class_b = torch.cat(missclassified_class_b, dim=0)
