@@ -3,6 +3,7 @@ Here is my plan to improver the sentiment_analysis software I have done:
 -save the preprocessed embeddings 
 ideas: in a .pt or .pkl document to load them 
 aim: decrease the Runtime
+ I did implement a saving the preprocessed data, but don't seemed to help on decreasing the runtime, maybe saving the weights and biases would help
 
 
 -optimize/experimenting then model architecture

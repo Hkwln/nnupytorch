@@ -6,6 +6,10 @@ from imports import *
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #print(f'Using device: {device}')
 
+#here is the path for the preprocessed data
+path = "preprocessed_data.pt"
+#here is the path for the saved model
+path2 = "saved_model.pt"
 sst2 = load_dataset("stanfordnlp/sst2")
 #dataset structure:
 # three splits: train, validation, test
@@ -109,14 +113,22 @@ def save_preprocessed(path):
 
 def load_preprocessed(path):
     data = torch.load(path)
-    return data
-#currently it saves the data in the superior directory, change is in process
-path = "preprocessed_data.pt"
+    return data["embeddings"],data["dataset_train_tokenized"], data["dataset_val_tokenized"]
+
 save_preprocessed(path)
 if path:
     embeddings, dataset_train_tokenized, dataset_val_tokenized = load_preprocessed(path)
 
-
+def save_model(path):
+    current_state = {
+        "model_state_dict": model2.state_dict(),
+        "optimizer_state_dict":optimizer.state_dict(),
+        "loss":loss
+    }
+    torch.save(current_state, path)
+def load_model(path):
+    data =torch.load(path)
+    return data["model_state_dict"],data["optimizer_state_dict"], data["loss"]
 
 # Define the model, this is the stable model and should not be edited
 class RnnTextClassifier(torch.nn.Module):
@@ -138,7 +150,6 @@ class RnnTextClassifier(torch.nn.Module):
 
 # Instantiate the model, if you instead want to use the experimental model, do it here
 model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
-
 
 
 # Define the evaluation function
@@ -167,6 +178,9 @@ loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(params=model2.parameters(), lr=1e-4)  # Adjusted learning rate
 losses_train, losses_val = [], []
 accuracies_train, accuracies_val = [], []
+#load the last model state if available
+if path2:
+    model2, optimizer, loss = load_model(path2)
 
 NUM_EPOCHS = 10
 pbar = trange(NUM_EPOCHS)
@@ -197,6 +211,8 @@ for epoch in pbar:
     pbar.set_postfix_str(
         f"Train loss: {losses_train[-1]} - Validation acc: {accuracies_val[-1]}"
     )
+#Saving the model weights and biases
+save_model(path2)
 
 # Visualize the loss and accuracy
 plt.plot(losses_train, color="orange", linestyle="-", label="Train loss")
