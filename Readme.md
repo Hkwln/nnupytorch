@@ -1,4 +1,4 @@
-<h1> Getting to know pytorch
+<h1> Getting to know pytorch</h1>
 
 Here I do simple excercises to get into pytorch
 
