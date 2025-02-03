@@ -1,0 +1,5 @@
+Here are my aims fo this binary classification mode:
+
+
+Experimenting with semi supervised learning
+trying other supervised learning loss functions instead of BCEloss

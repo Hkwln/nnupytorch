@@ -38,13 +38,17 @@ def get_sentiment(tensor):
         else: print("neutral")
 
     return probs
+i = True
+while i:
+    ipsentence = input("give me an input sentence:")
+    if ipsentence == ("Ende"):
+        i = False
+        break
+    #validate the input sentence
+    #Explanation: strip() function removes all white spaces
+    if not ipsentence.strip():
+        raise ValueError("Inputsentence cannot be empty.")
 
-ipsentence = input("give me an input sentence:")
-#validate the input sentence
-#Explanation: strip() function removes all white spaces
-if not ipsentence.strip():
-    raise ValueError("Inputsentence cannot be empty.")
-
-predictions = predict_sentence(ipsentence)
-display(get_sentiment(predictions))
+    predictions = predict_sentence(ipsentence)
+    display(get_sentiment(predictions))
 

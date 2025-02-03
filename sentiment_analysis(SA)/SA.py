@@ -1,6 +1,8 @@
 from imports import *
 #from rnn import RnnTextClassifier
-# here you can change the device to work on gpu
+
+
+#here you can change the device to work, not yet working
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #print(f'Using device: {device}')
 
@@ -15,16 +17,8 @@ dataset_val = sst2["validation"]
 # Download the GloVe embeddings
 glove = hf_hub_download("stanfordnlp/glove", "glove.6B.zip")
 
-#with zipfile.ZipFile(glove, "r") as f:
-#    print(f.namelist())
-
 # There are multiple files with different dimensionality of the features in the zip archive: 50d, 100d, 200d, 300d
 filename = "glove.6B.300d.txt"
-#with zipfile.ZipFile(glove, "r") as f:
-#    for idx, line in enumerate(f.open(filename)):
-#        #print(line)
-#        if idx == 5:
-#            break
 
 # Unpack the downloaded file
 word_to_index = dict()
@@ -102,7 +96,29 @@ def get_dataloader(dataset, batch_size=32, shuffle=False):
 train_dataloader = get_dataloader(dataset_train_tokenized, batch_size=32, shuffle=True)
 val_dataloader = get_dataloader(dataset_val_tokenized, batch_size=32, shuffle=False)
 
-# Define the model with increased complexity and dropout
+#save embeddings and tokenized dataset to disk
+def save_preprocessed(path):
+    preprocessed_data ={
+        "embeddings":embeddings,
+        "dataset_train_tokenized": dataset_train_tokenized,
+        "dataset_val_tokenized": dataset_val_tokenized
+    }
+    #save the embeddings tensor
+    torch.save(preprocessed_data, path)
+  
+
+def load_preprocessed(path):
+    data = torch.load(path)
+    return data
+#currently it saves the data in the superior directory, change is in process
+path = "preprocessed_data.pt"
+save_preprocessed(path)
+if path:
+    embeddings, dataset_train_tokenized, dataset_val_tokenized = load_preprocessed(path)
+
+
+
+# Define the model, this is the stable model and should not be edited
 class RnnTextClassifier(torch.nn.Module):
     def __init__(self, embeddings, hidden_size=128, padding_index=-1):
         super().__init__()
@@ -110,19 +126,20 @@ class RnnTextClassifier(torch.nn.Module):
             embeddings, freeze=True, padding_idx=padding_index
         )
         self.layer1 = torch.nn.RNN(embeddings.shape[1], hidden_size, batch_first=True)
-        #self.dropout = torch.nn.Dropout(0.5)
+        
         self.layer2 = torch.nn.Linear(hidden_size, 2)
     
     def forward(self, x):
         x = self.embedding(x)
         _, h_s = self.layer1(x)
         x = torch.relu(h_s[-1])
-        #x = self.dropout(x)
         x = self.layer2(x)
         return x
 
-# Instantiate the model
+# Instantiate the model, if you instead want to use the experimental model, do it here
 model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
+
+
 
 # Define the evaluation function
 def evaluate_model(model, dataloader, loss_fn=None):

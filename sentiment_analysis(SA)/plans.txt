@@ -1,0 +1,14 @@
+Here is my plan to improver the sentiment_analysis software I have done:
+
+-save the preprocessed embeddings 
+ideas: in a .pt or .pkl document to load them 
+aim: decrease the Runtime
+
+
+-optimize/experimenting then model architecture
+ideas: for example try GRU or LSTM instead of vanilla run_name
+aim: increase the performance
+
+- Maybe move the process to the GPU
+
+
