@@ -7,9 +7,9 @@ from imports import *
 #print(f'Using device: {device}')
 
 #here is the path for the preprocessed data
-path = os.path("./sentiment_analysis(SA)/preprocessed_data.pt")
+path = "preprocessed_data.pt"
 #here is the path for the saved model
-path2 = os.path("./sentiment_analysis(SA)/saved_model.pt")
+path2 = "saved_model.pt"
 load = False
 #save embeddings and tokenized dataset to disk
 def save_preprocessed(path):
@@ -29,7 +29,7 @@ def load_preprocessed(path):
 if os.path.exists(path):
     embeddings, dataset_train_tokenized, dataset_val_tokenized = load_preprocessed(path)
     Load = True
-else: save_preprocessed(path)
+
 
 if not load:
     sst2 = load_dataset("stanfordnlp/sst2")
@@ -121,6 +121,7 @@ def get_dataloader(dataset, batch_size=32, shuffle=False):
 if not load:
     train_dataloader = get_dataloader(dataset_train_tokenized, batch_size=32, shuffle=True)
     val_dataloader = get_dataloader(dataset_val_tokenized, batch_size=32, shuffle=False)
+    save_preprocessed(path)
 
 
 def save_model(path):
