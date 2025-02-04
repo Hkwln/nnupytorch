@@ -49,7 +49,7 @@ while i:
     #validate the input sentence
     if not ipsentence.strip():
         raise ValueError("Inputsentence cannot be empty.")
-
-    predictions = predict_sentence(ipsentence)
-    display(get_sentiment(predictions))
+    if not ipsentence == ("info"):
+        predictions = predict_sentence(ipsentence)
+        display(get_sentiment(predictions))
 
