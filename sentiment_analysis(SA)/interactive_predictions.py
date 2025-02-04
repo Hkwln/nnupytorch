@@ -43,7 +43,7 @@ while i:
     ipsentence = input("give me an input sentence:")
     if ipsentence == ("info"):
         print("here you can classify your sentence, you can quit by typing Ende or type quit")
-    if ipsentence == ("Ende") or ("quit"):
+    if ipsentence == ("Ende") or  ipsentence == ("quit"):
         i = False
         break
     #validate the input sentence

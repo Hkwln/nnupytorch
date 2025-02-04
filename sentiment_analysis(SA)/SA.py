@@ -20,7 +20,7 @@ def save_preprocessed(path):
     }
     #save the embeddings tensor
     torch.save(preprocessed_data, path)
-  
+
 
 def load_preprocessed(path):
     data = torch.load(path, weights_only = True)
