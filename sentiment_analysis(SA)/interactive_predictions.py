@@ -47,7 +47,6 @@ while i:
         i = False
         break
     #validate the input sentence
-    #Explanation: strip() function removes all white spaces
     if not ipsentence.strip():
         raise ValueError("Inputsentence cannot be empty.")
 

@@ -1,5 +1,6 @@
 from imports import *
-#from rnn import RnnTextClassifier
+from rnn import ExperimentalTextClassifier
+
 
 
 #here you can change the device to work, not yet working
@@ -154,7 +155,8 @@ class RnnTextClassifier(torch.nn.Module):
         return x
 
 # Instantiate the model, if you instead want to use the experimental model, do it here
-model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
+#model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
+model2 = ExperimentalTextClassifier(embeddings,padding_index = padding_token_id)
 #load the last model state if available
 if os.path.exists(path2):
     model2_state_dict, optimizer, loss = load_model(path2)

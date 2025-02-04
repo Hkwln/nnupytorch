@@ -14,7 +14,7 @@ class ExperimentalTextClassifier(torch.nn.Module):
             embeddings, freeze= True, padding_idx = padding_index
         )
         self.layer1 = torch.nn.RNN(embeddings.shape[1], hidden_size, batch_first= True)
-        #self.dropout = torch.nn.Dropout(0.5)
+        self.dropout = torch.nn.Dropout(0.5)
         self.layer2 = torch.nn.Linear(hidden_size, 2)
         
     def forward(self, x):
@@ -22,6 +22,6 @@ class ExperimentalTextClassifier(torch.nn.Module):
         _, h_s = self.layer1(x) # returns(output, hidden_state) 
         # the hidden state captures the last time step, using the output would require additional processing to aggregate the information from all time steps, thus it is not used
         x = torch.relu(h_s[-1])
-        #x = self.dropout(x)
+        x = self.dropout(x)
         x = self.layer2(x)
         return x
