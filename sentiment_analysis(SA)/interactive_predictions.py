@@ -31,9 +31,9 @@ def get_sentiment(tensor):
     #negative: [[over 50%][under 50%]]
     #neutral:  both under or both over 50%
     for bad,good in probs:
-        if bad <0.5 and good >0.5:
+        if bad <0.4:
             print("positive")
-        elif bad >0.5 and good <0.5:
+        elif bad >0.6:
             print("negative")
         else: print("neutral")
 
@@ -41,7 +41,9 @@ def get_sentiment(tensor):
 i = True
 while i:
     ipsentence = input("give me an input sentence:")
-    if ipsentence == ("Ende"):
+    if ipsentence == ("info"):
+        print("here you can classify your sentence, you can quit by typing Ende or type quit")
+    if ipsentence == ("Ende") or ("quit"):
         i = False
         break
     #validate the input sentence
