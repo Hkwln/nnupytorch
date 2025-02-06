@@ -13,7 +13,7 @@ class ExperimentalTextClassifier(torch.nn.Module):
         self.embedding = torch.nn.Embedding.from_pretrained(
             embeddings, freeze= True, padding_idx = padding_index
         )
-        self.layer1 = torch.nn.RNN(embeddings.shape[1], hidden_size, batch_first= True)
+        self.layer1 = torch.nn.GRU(embeddings.shape[1], hidden_size, batch_first= True)
         self.dropout = torch.nn.Dropout(0.5)
         self.layer2 = torch.nn.Linear(hidden_size, 2)
         

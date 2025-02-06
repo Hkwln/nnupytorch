@@ -38,18 +38,34 @@ def get_sentiment(tensor):
         else: print("neutral")
 
     return probs
-i = True
-while i:
-    ipsentence = input("give me an input sentence:")
-    if ipsentence == ("info"):
-        print("here you can classify your sentence, you can quit by typing Ende or type quit")
-    if ipsentence == ("Ende") or  ipsentence == ("quit"):
-        i = False
-        break
-    #validate the input sentence
-    if not ipsentence.strip():
-        raise ValueError("Inputsentence cannot be empty.")
-    if not ipsentence == ("info"):
-        predictions = predict_sentence(ipsentence)
-        display(get_sentiment(predictions))
+
+
+# change the while True function into a a function with recursion
+def interactive_part():
+    sentence = input("give me an input sentence:")
+    if sentence == ("info"):
+        print(f"here you can classify your sentence, you can quit by typing Ende or type quit \n")
+    if not sentence == ("Ende") or  sentence == ("quit"):
+        #validate the input sentence
+        if not sentence.strip():
+            raise ValueError("Inputsentence cannot be empty.")
+        if not sentence == ("info"):
+            predictions = predict_sentence(sentence)
+            answer = get_sentiment(predictions)
+            display(answer)
+            label = input("is the prediction correct?y/n:")
+            if label == "y":
+                
+                if display(answer)=="positive":
+                    label = 0
+                else: label = 1
+            elif label == "n":
+                
+                if display(answer) =="positive":
+                    label = 1
+                else: label = 0
+            else: 
+                raise ValueError("You have to type y/n and not some other bullshit")
+        interactive_part()
+
 
