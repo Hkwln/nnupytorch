@@ -1,6 +1,6 @@
 from ipywidgets import widgets
 from IPython.display import display
-from SA import model2, map_text_to_indices, load_preprocessed, save_preprocessed, path, prepare_dataset
+from SA import model2, map_text_to_indices, path, prepare_dataset
 import torch
 
 
@@ -77,19 +77,21 @@ def interactive_part(sentence = None, label = None):
         return dataset
     else:
         raise ValueError("This should not happen in any way, how did you do that?")
-
+#now i want to add my newly self created dataset to the old dataset
+#step 1: preprocessing the dataset
+#step 2: adding the additional dataset to the preprocessed_data.pt
+def update_preprocessed_data(new_dataset):
+    #get the preprocessed data
+    preprocessed = torch.load(path)
+    #prepare the new data
+    new_data = prepare_dataset(new_dataset)
+    #add the new data to the old preprocessed
+    preprocessed["dataset_train_tokenized"].extend(new_data)
+    torch.save(preprocessed,path)
 #usage:
 
 dataset = interactive_part()
 print("final dataset:", dataset)
-#now i want to add my newly self created dataset to the old dataset
-#step 1: preprocessing the dataset
-#step 2: adding the additional dataset to the preprocessed_data.pt
-def update_preprocessed_data(dataset):
-    #get the preprocessed data
-    old_preprocessed = load_preprocessed(path)
-    #prepare the new data
-    prepare_dataset(dataset)
-    #add the new data to the old preprocessed
-    old_preprocessed.append(dataset)
-    save_preprocessed(path)
+update_preprocessed_data(dataset)
+
+print("the preprocessed_dataset has been updated")
