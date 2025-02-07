@@ -39,33 +39,48 @@ def get_sentiment(tensor):
 
     return probs
 
-
 # change the while True function into a a function with recursion
-def interactive_part():
-    sentence = input("give me an input sentence:")
-    if sentence == ("info"):
+def interactive_part(sentence = None, label = None):
+    if sentence is None or label is None:
+        sentence = []
+        label = []
+    ipsentence = input("give me an input sentence:")
+    
+    if ipsentence == ("info"):
         print(f"here you can classify your sentence, you can quit by typing Ende or type quit \n")
-    if not sentence == ("Ende") or  sentence == ("quit"):
+    if not ipsentence == ("Ende") or  ipsentence == ("quit"):
         #validate the input sentence
-        if not sentence.strip():
+        if not ipsentence.strip():
             raise ValueError("Inputsentence cannot be empty.")
-        if not sentence == ("info"):
-            predictions = predict_sentence(sentence)
-            answer = get_sentiment(predictions)
-            display(answer)
-            label = input("is the prediction correct?y/n:")
-            if label == "y":
+        if not ipsentence == ("info"):
+            
+            predictions = predict_sentence(ipsentence) 
+            answer = display(get_sentiment(predictions))
+            correction = input("is the prediction correct?y/n:")
+            if correction == "y":
                 
-                if display(answer)=="positive":
-                    label = 0
-                else: label = 1
-            elif label == "n":
+                if answer=="positive":
+                    iplabel = 0
+                else: iplabel = 1
+            elif correction == "n":
                 
-                if display(answer) =="positive":
-                    label = 1
-                else: label = 0
+                if answer =="positive":
+                    iplabel = 1
+                else: iplabel = 0
             else: 
                 raise ValueError("You have to type y/n and not some other bullshit")
-        interactive_part()
+            #here we add the current sentence and the label both to an array
+            label.append(iplabel)
+            sentence.append(ipsentence)
+        return interactive_part(sentence, label)
+    #termination condition
+    elif ipsentence in ("Ende", "quit"):
+    #now i want to save the idx, sentences and labels into a tuple
+        dataset = [(idx, sentence, label) for idx, (sentence, label) in enumerate(zip(sentence, label))]
+        return dataset
+    else:
+        raise ValueError("This should not happen in any way, how did you do that?")
 
-
+#usage:
+dataset = interactive_part()
+print("final dataset:", dataset)
