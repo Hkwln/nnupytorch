@@ -1,6 +1,6 @@
 from ipywidgets import widgets
 from IPython.display import display
-from SA import model2, map_text_to_indices
+from SA import model2, map_text_to_indices, load_preprocessed, save_preprocessed, path, prepare_dataset
 import torch
 
 
@@ -27,13 +27,10 @@ def get_sentiment(tensor):
     #normalize the exponentials to get the probabilities
     probs = exp / total
     #define if the text is positiv, negativ or neutral
-    #positiv: [[under 50%][over 50%]]
-    #negative: [[over 50%][under 50%]]
-    #neutral:  both under or both over 50%
     for bad,good in probs:
-        if bad <0.4:
+        if bad <0.5:
             print("positive")
-        elif bad >0.6:
+        elif bad >0.5:
             print("negative")
         else: print("neutral")
 
@@ -82,5 +79,17 @@ def interactive_part(sentence = None, label = None):
         raise ValueError("This should not happen in any way, how did you do that?")
 
 #usage:
+
 dataset = interactive_part()
 print("final dataset:", dataset)
+#now i want to add my newly self created dataset to the old dataset
+#step 1: preprocessing the dataset
+#step 2: adding the additional dataset to the preprocessed_data.pt
+def update_preprocessed_data(dataset):
+    #get the preprocessed data
+    old_preprocessed = load_preprocessed(path)
+    #prepare the new data
+    prepare_dataset(dataset)
+    #add the new data to the old preprocessed
+    old_preprocessed.append(dataset)
+    save_preprocessed(path)
