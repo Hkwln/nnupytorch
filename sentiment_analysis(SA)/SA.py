@@ -190,7 +190,7 @@ optimizer = torch.optim.Adam(params=model2.parameters(), lr=1e-4)  # Adjusted le
 losses_train, losses_val = [], []
 accuracies_train, accuracies_val = [], []
 
-NUM_EPOCHS = 2
+NUM_EPOCHS = 5
 pbar = trange(NUM_EPOCHS)
 
 for epoch in pbar:
