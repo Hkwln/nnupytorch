@@ -53,16 +53,19 @@ def interactive_part(sentence = None, label = None):
             
             predictions = predict_sentence(ipsentence) 
             answer = display(get_sentiment(predictions))
-            correction = input("what was the correct answer?p/n:")
-            if correction == ("p"):
-                iplabel = 1
-            elif correction == ("n"):
-                iplabel = 0
-            else: 
-                raise ValueError("You have to type y/n and not some other bullshit")
-            #here we add the current sentence and the label both to an array
-            label.append(iplabel)
-            sentence.append(ipsentence)
+            while True:
+                correction = input("what was the correct answer?p/n/nope:")
+                if correction == ("p"):
+                    iplabel = 1
+                    break
+                elif correction == ("n"):
+                    iplabel = 0
+                    break
+                elif correction  == ("nope"):
+                    break
+                #here we add the current sentence and the label both to an array
+                label.append(iplabel)
+                sentence.append(ipsentence)
         return interactive_part(sentence, label)
     #termination condition
     elif ipsentence in ("Ende", "quit"):
@@ -72,12 +75,12 @@ def interactive_part(sentence = None, label = None):
         features = Features({
             "idx": Value("int32"),
             "sentence": Value("string"),
-            "labels": ClassLabel(names=["negative","positive"])
+            "label": ClassLabel(names=["negative","positive"])
         })
         data = {
             "idx": list(range(len(sentence))),
             "sentence": sentence,
-            "labels": label
+            "label": label
         }
         dataset = Dataset.from_dict(data, features=features)
         return dataset
@@ -100,5 +103,4 @@ def update_preprocessed_data(new_dataset):
 dataset = interactive_part()
 print("final dataset:", dataset)
 update_preprocessed_data(dataset)
-
 print("the preprocessed_dataset has been updated")
