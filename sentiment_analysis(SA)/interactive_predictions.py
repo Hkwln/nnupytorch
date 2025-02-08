@@ -53,17 +53,11 @@ def interactive_part(sentence = None, label = None):
             
             predictions = predict_sentence(ipsentence) 
             answer = display(get_sentiment(predictions))
-            correction = input("is the prediction correct?y/n:")
-            if correction == "y":
-                
-                if answer=="positive":
-                    iplabel = 0
-                else: iplabel = 1
-            elif correction == "n":
-                
-                if answer =="positive":
-                    iplabel = 1
-                else: iplabel = 0
+            correction = input("what was the correct answer?p/n:")
+            if correction == ("p"):
+                iplabel = 1
+            elif correction == ("n"):
+                iplabel = 0
             else: 
                 raise ValueError("You have to type y/n and not some other bullshit")
             #here we add the current sentence and the label both to an array
@@ -72,8 +66,10 @@ def interactive_part(sentence = None, label = None):
         return interactive_part(sentence, label)
     #termination condition
     elif ipsentence in ("Ende", "quit"):
-    #now i want to save the idx, sentences and labels into a tuple
-        dataset = [(idx, sentence, label) for idx, (sentence, label) in enumerate(zip(sentence, label))]
+    #now i want to save the feautures:(idx, sentences and labels) num:(rows) into a tuple
+        
+        features = [(idx, sentence, label) for idx, (sentence, label) in enumerate(zip(sentence, label))]
+        dataset = {"features":features,"num_rows:":len(features)}
         return dataset
     else:
         raise ValueError("This should not happen in any way, how did you do that?")
