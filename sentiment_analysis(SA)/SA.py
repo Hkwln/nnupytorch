@@ -1,6 +1,6 @@
 from imports import *
-from rnn import ExperimentalTextClassifier
-
+from experimental_network import ExperimentalTextClassifier
+from stable_network import RnnTextClassifier
 
 
 #here you can change the device to work, not yet working
@@ -136,23 +136,6 @@ def load_model(path):
     data =torch.load(path, weights_only= True)
     return data["model_state_dict"],data["optimizer_state_dict"], data["loss"]
 
-# Define the model, this is the stable model and should not be edited
-class RnnTextClassifier(torch.nn.Module):
-    def __init__(self, embeddings, hidden_size=128, padding_index=-1):
-        super().__init__()
-        self.embedding = torch.nn.Embedding.from_pretrained(
-            embeddings, freeze=True, padding_idx=padding_index
-        )
-        self.layer1 = torch.nn.RNN(embeddings.shape[1], hidden_size, batch_first=True)
-        
-        self.layer2 = torch.nn.Linear(hidden_size, 2)
-    
-    def forward(self, x):
-        x = self.embedding(x)
-        _, h_s = self.layer1(x)
-        x = torch.relu(h_s[-1])
-        x = self.layer2(x)
-        return x
 
 # Instantiate the model, if you instead want to use the experimental model, do it here
 model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
@@ -161,7 +144,6 @@ model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
 #if os.path.exists(path2):
 #    model2_state_dict, optimizer, loss = load_model(path2)
 #    model2.load_state_dict(model2_state_dict)
-
 
 # Define the evaluation function
 def evaluate_model(model, dataloader, loss_fn=None):
