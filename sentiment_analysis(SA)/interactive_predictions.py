@@ -2,7 +2,7 @@ from ipywidgets import widgets
 from IPython.display import display
 from SA import model2, map_text_to_indices, path, prepare_dataset
 import torch
-
+from datasets import Features, Value, ClassLabel, Dataset
 
 #here we change the char input sentence into tokens and finaly into a torch tensor and feed into the model
 #input: sentence in char
@@ -66,10 +66,20 @@ def interactive_part(sentence = None, label = None):
         return interactive_part(sentence, label)
     #termination condition
     elif ipsentence in ("Ende", "quit"):
-    #now i want to save the feautures:(idx, sentences and labels) num:(rows) into a tuple
+    #now i want to save the feautures:(idx, sentence and labels) num:(rows) 
+    #this should be the same data structure as the data loaded from the hugginface_hub
         
-        features = [(idx, sentence, label) for idx, (sentence, label) in enumerate(zip(sentence, label))]
-        dataset = {"features":features,"num_rows:":len(features)}
+        features = Features({
+            "idx": Value("int32"),
+            "sentence": Value("string"),
+            "labels": ClassLabel(names=["negative","positive"])
+        })
+        data = {
+            "idx": list(range(len(sentence))),
+            "sentence": sentence,
+            "labels": label
+        }
+        dataset = Dataset.from_dict(data, features=features)
         return dataset
     else:
         raise ValueError("This should not happen in any way, how did you do that?")
@@ -84,6 +94,7 @@ def update_preprocessed_data(new_dataset):
     #add the new data to the old preprocessed
     preprocessed["dataset_train_tokenized"].extend(new_data)
     torch.save(preprocessed, path)
+
 #usage:
 
 dataset = interactive_part()
