@@ -82,12 +82,12 @@ def interactive_part(sentence = None, label = None):
 #step 2: adding the additional dataset to the preprocessed_data.pt
 def update_preprocessed_data(new_dataset):
     #get the preprocessed data
-    preprocessed = torch.load(path)
+    preprocessed = torch.load(path, weights_only= True)
     #prepare the new data
     new_data = prepare_dataset(new_dataset)
     #add the new data to the old preprocessed
     preprocessed["dataset_train_tokenized"].extend(new_data)
-    torch.save(preprocessed,path)
+    torch.save(preprocessed, path)
 #usage:
 
 dataset = interactive_part()

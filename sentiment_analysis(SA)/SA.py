@@ -3,15 +3,22 @@ from experimental_network import ExperimentalTextClassifier
 from stable_network import RnnTextClassifier
 
 
+
 #here you can change the device to work, not yet working
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #print(f'Using device: {device}')
 
+#saving the data in a folder inside the directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+save_folder = os.path.join(current_dir, "saved_training")
+if not os.path.exists(save_folder):
+    os.makedirs(save_folder, exist_ok= True)
 #here is the path for the preprocessed data
-path = "preprocessed_data.pt"
+path = os.path.join(save_folder,"preprocessed_data.pt")
 #here is the path for the saved model
-path2 = "saved_model.pt"
-load = False
+path2 = os.path.join(save_folder,"saved_model.pt")
+load_data = False
+load_network = False
 #save embeddings and tokenized dataset to disk
 def save_preprocessed(path):
     preprocessed_data ={
@@ -32,7 +39,7 @@ if os.path.exists(path):
     Load = True
 
 
-if not load:
+if not load_data:
     sst2 = load_dataset("stanfordnlp/sst2")
     #dataset structure:
     # three splits: train, validation, test
@@ -91,7 +98,7 @@ def prepare_dataset(dataset):
         token_ids = map_text_to_indices(example["sentence"])
         tokenized_dataset.append({"token_ids": token_ids, "label": example["label"]})
     return tokenized_dataset
-if not load:
+if not load_data:
     dataset_train_tokenized = prepare_dataset(dataset_train)
     dataset_val_tokenized = prepare_dataset(dataset_val)
 
@@ -119,7 +126,7 @@ def get_dataloader(dataset, batch_size=32, shuffle=False):
         collate_fn=partial(pad_inputs, padding_value=padding_token_id),
         shuffle=shuffle,
     )
-if not load:
+if not load_data:
     train_dataloader = get_dataloader(dataset_train_tokenized, batch_size=32, shuffle=True)
     val_dataloader = get_dataloader(dataset_val_tokenized, batch_size=32, shuffle=False)
     save_preprocessed(path)
@@ -141,9 +148,11 @@ def load_model(path):
 model2 = RnnTextClassifier(embeddings, padding_index=padding_token_id)
 #model2 = ExperimentalTextClassifier(embeddings,padding_index = padding_token_id)
 #load the last model state if available
-#if os.path.exists(path2):
-#    model2_state_dict, optimizer, loss = load_model(path2)
-#    model2.load_state_dict(model2_state_dict)
+
+if os.path.exists(path2):
+   model2_state_dict, optimizer, loss = load_model(path2)
+   model2.load_state_dict(model2_state_dict)
+   load_network = True
 
 # Define the evaluation function
 def evaluate_model(model, dataloader, loss_fn=None):
@@ -167,48 +176,50 @@ def compute_accuracy(predictions: torch.tensor, labels: torch.tensor):
     return torch.sum(torch.argmax(predictions, dim=1) == labels).item() / len(labels)
 
 # Training loop with adjusted learning rate
-loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(params=model2.parameters(), lr=1e-4)  # Adjusted learning rate
-losses_train, losses_val = [], []
-accuracies_train, accuracies_val = [], []
+# if the network has been loaded from previous training, it doesn not train 
+if not load_network:
+    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(params=model2.parameters(), lr=1e-4)  # Adjusted learning rate
+    losses_train, losses_val = [], []
+    accuracies_train, accuracies_val = [], []
 
-NUM_EPOCHS = 5
-pbar = trange(NUM_EPOCHS)
+    NUM_EPOCHS = 10
+    pbar = trange(NUM_EPOCHS)
 
-for epoch in pbar:
-    model2.train()
-    for batch in train_dataloader:
-        token_ids = batch["token_ids"]
-        labels = batch["label"]
+    for epoch in pbar:
+        model2.train()
+        for batch in train_dataloader:
+            token_ids = batch["token_ids"]
+            labels = batch["label"]
 
-        predictions = model2(token_ids)
+            predictions = model2(token_ids)
 
-        loss = loss_fn(predictions, labels)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-    
-    # Compute loss and accuracy on the training set
-    train_accuracy, train_loss = evaluate_model(model2, train_dataloader, loss_fn)
-    losses_train.append(train_loss)
-    accuracies_train.append(train_accuracy)
-    
-    # Compute loss and accuracy on the validation set
-    val_accuracy, val_loss = evaluate_model(model2, val_dataloader, loss_fn)
-    losses_val.append(val_loss)
-    accuracies_val.append(val_accuracy)
+            loss = loss_fn(predictions, labels)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        
+        # Compute loss and accuracy on the training set
+        train_accuracy, train_loss = evaluate_model(model2, train_dataloader, loss_fn)
+        losses_train.append(train_loss)
+        accuracies_train.append(train_accuracy)
+        
+        # Compute loss and accuracy on the validation set
+        val_accuracy, val_loss = evaluate_model(model2, val_dataloader, loss_fn)
+        losses_val.append(val_loss)
+        accuracies_val.append(val_accuracy)
 
-    pbar.set_postfix_str(
-        f"Train loss: {losses_train[-1]} - Validation acc: {accuracies_val[-1]}"
-    )
-#Saving the model weights and biases
-save_model(path2)
+        pbar.set_postfix_str(
+            f"Train loss: {losses_train[-1]} - Validation acc: {accuracies_val[-1]}"
+        )
+    #Saving the model weights and biases
+    save_model(path2)
 
-# Visualize the loss and accuracy
-plt.plot(losses_train, color="orange", linestyle="-", label="Train loss")
-plt.plot(losses_val, color="orange", linestyle="--", label="Validation loss")
-plt.plot(accuracies_train, color="steelblue", linestyle="-", label="Train accuracy")
-plt.plot(accuracies_val, color="steelblue", linestyle="--", label="Validation accuracy")
-plt.xlabel("Epoch")
-plt.legend()
-plt.show()
+    # Visualize the loss and accuracy
+    plt.plot(losses_train, color="orange", linestyle="-", label="Train loss")
+    plt.plot(losses_val, color="orange", linestyle="--", label="Validation loss")
+    plt.plot(accuracies_train, color="steelblue", linestyle="-", label="Train accuracy")
+    plt.plot(accuracies_val, color="steelblue", linestyle="--", label="Validation accuracy")
+    plt.xlabel("Epoch")
+    plt.legend()
+    plt.show()
