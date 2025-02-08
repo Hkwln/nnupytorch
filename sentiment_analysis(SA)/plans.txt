@@ -28,3 +28,4 @@ ideensammeln für spiele:
 vllt ein spiel wo man fähigkeiten auswählt also optimizer layertypen ob RNN oder GRU.. und dann lässt man sie gegen andere spieler antreten
 zb in einem performance test, der dann automatisch ausgeführt ist, und dann muss man einen satzt dem anderen geben der von der anderen ki möglichtst
 falsch ist, wenn das der fall ist, gewinnst during
+problem ist gerade, entweder ich baue jetzt immer mehr features zu dem  bestehenden, oder ich bastel eine ui oder eine bash konsolenanwendung drum rum, sodass es trotzdem functioniert

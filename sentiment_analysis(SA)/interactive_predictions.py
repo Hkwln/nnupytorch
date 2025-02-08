@@ -1,6 +1,6 @@
 from ipywidgets import widgets
 from IPython.display import display
-from SA import model2, map_text_to_indices, path, prepare_dataset
+from main import model2, map_text_to_indices, path, prepare_dataset
 import torch
 from datasets import Features, Value, ClassLabel, Dataset
 
@@ -37,45 +37,49 @@ def get_sentiment(tensor):
     return probs
 
 # change the while True function into a a function with recursion
-def interactive_part(sentence = None, label = None):
+def interactive_part(sentence=None, label=None):
     if sentence is None or label is None:
         sentence = []
         label = []
+
     ipsentence = input("give me an input sentence:")
-    
-    if ipsentence == ("info"):
-        print(f"here you can classify your sentence, you can quit by typing Ende or type quit \n")
-    if not ipsentence == ("Ende") or  ipsentence == ("quit"):
-        #validate the input sentence
+
+    if ipsentence == "info":
+        print("here you can classify your sentence, you can quit by typing Ende or quit")
+        
+    if ipsentence not in ("Ende", "quit"):
+        # Validate the input sentence
         if not ipsentence.strip():
-            raise ValueError("Inputsentence cannot be empty.")
-        if not ipsentence == ("info"):
+            raise ValueError("Input sentence cannot be empty.")
+        if ipsentence != "info":
+            predictions = predict_sentence(ipsentence)
+            _ = display(get_sentiment(predictions))
             
-            predictions = predict_sentence(ipsentence) 
-            answer = display(get_sentiment(predictions))
+            # Get a valid correction from the user
             while True:
                 correction = input("what was the correct answer?p/n/nope:")
-                if correction == ("p"):
+                if correction == "p":
                     iplabel = 1
                     break
-                elif correction == ("n"):
+                elif correction == "n":
                     iplabel = 0
                     break
-                elif correction  == ("nope"):
+                elif correction == "nope":
+                    iplabel = None  # Decide how you want to handle "nope"
                     break
-                #here we add the current sentence and the label both to an array
+                else:
+                    print("Invalid input, please type 'p', 'n', or 'nope'.")
+
+            # Append the sentence and label if a valid label is obtained
+            if iplabel is not None:
                 label.append(iplabel)
                 sentence.append(ipsentence)
         return interactive_part(sentence, label)
-    #termination condition
     elif ipsentence in ("Ende", "quit"):
-    #now i want to save the feautures:(idx, sentence and labels) num:(rows) 
-    #this should be the same data structure as the data loaded from the hugginface_hub
-        
         features = Features({
             "idx": Value("int32"),
             "sentence": Value("string"),
-            "label": ClassLabel(names=["negative","positive"])
+            "label": ClassLabel(names=["negative", "positive"])
         })
         data = {
             "idx": list(range(len(sentence))),
@@ -86,6 +90,7 @@ def interactive_part(sentence = None, label = None):
         return dataset
     else:
         raise ValueError("This should not happen in any way, how did you do that?")
+
 #now i want to add my newly self created dataset to the old dataset
 #step 1: preprocessing the dataset
 #step 2: adding the additional dataset to the preprocessed_data.pt
