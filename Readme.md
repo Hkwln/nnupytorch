@@ -8,8 +8,10 @@ The exciting folders are
      here i coded a rnn which can give you the mood of a message: positive,negative,neutral
             imports.py just imports all packages
             interactiv_predictions.py here you can run the programm
-            rnn.py testing network
-            SA.py here is where the action is, the dataloading, the network and the training
+            experimental_model.py testing network
+            stable_model.py stable network
+            main.py here is where the action is, the dataloading, the network and the training
+            
 - Binary_classification:
     Here is a model which creates 2 different classes of points and classifies them
         dataset.py creates the dataset
