@@ -15,7 +15,7 @@ text_files = [file for file in all_files if file.endswith('.txt')]
 # Read the contents of each text file and concatenate them
 all_text = ""
 for file_name in text_files:
-    with open(os.path.join(dataset_folder, file_name), 'r', encoding='UTF-8') as file:
+    with open(os.path.join(dataset_folder, file_name), 'r', encoding='CP1252') as file:
         all_text += file.read()
         print(len(all_text))
 
