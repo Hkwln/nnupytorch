@@ -1,0 +1,9 @@
+
+*/_pycache_
+*.pt
+*.txt
+*apikey.py
+.pytest_cache
+sentiment_analysis(SA)/saved_training/*.pt
+*.txt
+*.py[cod]

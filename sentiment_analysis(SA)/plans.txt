@@ -1,0 +1,31 @@
+Here is my plan to improver the sentiment_analysis software I have done:
+
+-save the preprocessed embeddings 
+ideas: in a .pt or .pkl document to load them 
+aim: decrease the Runtime
+ I did implement a saving the preprocessed data, but don't seemed to help on decreasing the runtime, maybe saving the weights and biases would help
+
+
+-optimize/experimenting then model architecture
+ideas: for example try GRU or LSTM instead of vanilla run_name
+aim: increase the performance
+
+- Maybe move the process to the GPU
+
+- adding logging the data,
+    ideas: i want to log the accuracies, trained epochs and the training epoch and want to give them a name, 
+    in case the name, you should choose between creating a new log or take the old one, in case you take the old one, the epochs and training should be updated/replaced
+    aim: having a comparising between two models
+
+
+- implement incremental learning approach
+    ideas: you should be able to feed the system new training data and labels 
+    aim: improving the accuracy, making the training data bigger
+
+
+- wrap all these features into an ui
+ideensammeln für spiele: 
+vllt ein spiel wo man fähigkeiten auswählt also optimizer layertypen ob RNN oder GRU.. und dann lässt man sie gegen andere spieler antreten
+zb in einem performance test, der dann automatisch ausgeführt ist, und dann muss man einen satzt dem anderen geben der von der anderen ki möglichtst
+falsch ist, wenn das der fall ist, gewinnst during
+problem ist gerade, entweder ich baue jetzt immer mehr features zu dem  bestehenden, oder ich bastel eine ui oder eine bash konsolenanwendung drum rum, sodass es trotzdem functioniert
