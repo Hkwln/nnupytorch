@@ -4,6 +4,7 @@ Here I do simple excercises to get into pytorch
 
 How do you orientate here:
 The exciting folders are 
+- single layer neural network: here i experiment with only single layer neural network and discuss the usecase of such
 - sentiment_analysis:
      here i coded a rnn which can give you the mood of a message: positive,negative,neutral
             imports.py just imports all packages
@@ -20,3 +21,4 @@ The exciting folders are
 - Tests:
     Here is a cudacheck test to see if cuda works on your system and a model, which is a model blueprint that helped me
     
+
