@@ -1,0 +1,1 @@
+for more informations about pydantic Ai visit their webistite = https://ai.pydantic.dev/
