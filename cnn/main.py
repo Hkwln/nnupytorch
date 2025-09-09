@@ -3,6 +3,7 @@ from datasets import load_dataset
 from torchvision import transforms
 from model import simplecnn
 from datasethandler import MathSymbolsDataset
+from torch.utils.data import DataLoader
 #               data preperation
 ds = load_dataset("prithivMLmods/Math-symbols")
 print(torch.cuda.is_available())
@@ -20,8 +21,9 @@ transform=  transforms.Compose([
 ])
 
 train_dataset = MathSymbolsDataset(x_train, y_train, transform)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-#training the model
+
 model = simplecnn()
 
 loss_fn = torch.nn.CrossEntropyLoss()
@@ -31,6 +33,13 @@ accuracy_train, accuracy_val = [],[]
 
 for epoch in 20:
     model.train()
+    for image, labels in train_loader:
+        outputs = model(image)
+        loss = loss_fn(outputs, labels)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
     
 
 #testing the model with the validation set

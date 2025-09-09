@@ -18,7 +18,10 @@ The exciting folders are
         dataset.py creates the dataset
         data_visualization.py plots the batches
         Multiclass_classificatioin.py Here you run the program and is the dataloading, the network and the training
+- Convolution neural network:
+    Here is a cnn which which is still in progress, it should recognize simple math symbols like circle, kite,parallelogram, rectangle, rhombos, square, trapezoid, triangle.
 - Tests:
     Here is a cudacheck test to see if cuda works on your system and a model, which is a model blueprint that helped me
+
     
 
