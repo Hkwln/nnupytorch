@@ -8,9 +8,7 @@ from torch.utils.data import DataLoader
 ds = load_dataset("prithivMLmods/Math-symbols")
 print(torch.cuda.is_available())
 #false
-print(ds)
 train = ds["train"]
-print(train)
 #shape of the dataset:
 x_train,y_train= train["image"], train["label"]
 
