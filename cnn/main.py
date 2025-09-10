@@ -34,7 +34,6 @@ for epoch in 20:
     for image, labels in train_loader:
         outputs = model(image)
         loss = loss_fn(outputs, labels)
-
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
