@@ -29,7 +29,7 @@ optimizer = torch.optim.Adam(params = model.parameters(),lr = 1e-4)
 losses_train, losses_val = [],[]
 accuracy_train, accuracy_val = [],[]
 
-for epoch in 20:
+for epoch in range(20):
     model.train()
     for image, labels in train_loader:
         outputs = model(image)
