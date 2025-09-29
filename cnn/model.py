@@ -4,10 +4,10 @@ class simplecnn(torch.nn.Module):
     def __init__(self, num_classes=8):
         super(simplecnn, self).__init__()
         self.conv = torch.nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3)
-        self.pooling = torch.nn.MaxPool2d(kernel_size =244,padding= 0 )
-        self.fcl = torch.nn.Linear(16, num_classes)
+        self.pooling = torch.nn.MaxPool2d(kernel_size=2, stride=2)
+        self.fcl = torch.nn.Linear(16 * 111 * 111, num_classes)
     def forward(self, x):
-        x= self.pooling(torch.nn.functional.relu(self.conv(x)))
-        x= self.fcl(x)
-
+        x = self.pooling(torch.nn.functional.relu(self.conv(x)))
+        x = x.view(x.size(0), -1)  # Flatten for the linear layer
+        x = self.fcl(x)
         return x

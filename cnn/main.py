@@ -6,11 +6,12 @@ from datasethandler import MathSymbolsDataset
 from torch.utils.data import DataLoader
 #               data preperation
 ds = load_dataset("prithivMLmods/Math-symbols")
-print(torch.cuda.is_available())
-#false
+# the dataset has a train vaidation and test batch
+validation =ds["validation"]
 train = ds["train"]
 #shape of the dataset:
 x_train,y_train= train["image"], train["label"]
+x_test ,y_test = validation["image"], validation["label"]
 
 #changing the jpeg into tensor and refactoring the dataset
 transform=  transforms.Compose([
@@ -28,9 +29,9 @@ loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(params = model.parameters(),lr = 1e-4)
 losses_train, losses_val = [],[]
 accuracy_train, accuracy_val = [],[]
-
-for epoch in range(20):
-    model.train()
+num_epochs = 20
+for epoch in range(num_epochs):
+    print(f"Epoch [{epoch + 1}/{num_epochs}]")
     for image, labels in train_loader:
         outputs = model(image)
         loss = loss_fn(outputs, labels)
@@ -40,3 +41,11 @@ for epoch in range(20):
     
 
 #testing the model with the validation set
+# todo: check model.predict functioin, does that exist in pytorch? 
+validation_dataset = MathSymbolsDateset(x_test, y_test, transform)
+for i in range(len(validation_datset)):
+    count = 0
+    for image, label in validation_dataset:
+        if model.predict(image) = label
+            count++
+print("your model got %d samples out of %d correct ", count, len(validation_dataset)
