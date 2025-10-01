@@ -46,6 +46,6 @@ validation_dataset = MathSymbolsDateset(x_test, y_test, transform)
 for i in range(len(validation_datset)):
     count = 0
     for image, label in validation_dataset:
-        if model.predict(image) = label
-            count++
-print("your model got %d samples out of %d correct ", count, len(validation_dataset)
+        if model.predict(image) == label:
+            count= count +1
+print("your model got %d samples out of %d correct ", count, len(validation_dataset))
