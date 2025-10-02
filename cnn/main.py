@@ -29,7 +29,7 @@ loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(params = model.parameters(),lr = 1e-4)
 losses_train, losses_val = [],[]
 accuracy_train, accuracy_val = [],[]
-num_epochs = 20
+num_epochs = 2
 for epoch in range(num_epochs):
     print(f"Epoch [{epoch + 1}/{num_epochs}]")
     for image, labels in train_loader:
@@ -41,11 +41,14 @@ for epoch in range(num_epochs):
     
 
 #testing the model with the validation set
-# todo: check model.predict functioin, does that exist in pytorch? 
+# todo: there is model.eval(), does that work that way? also 
 validation_dataset = MathSymbolsDateset(x_test, y_test, transform)
-for i in range(len(validation_datset)):
-    count = 0
-    for image, label in validation_dataset:
-        if model.predict(image) == label:
-            count= count +1
+model.eval()
+with torch.no_grad():
+    
+    for i in range(len(validation_datset)):
+        count = 0
+        for image, label in validation_dataset:
+            if model(image) == label:
+                count= count +1
 print("your model got %d samples out of %d correct ", count, len(validation_dataset))
