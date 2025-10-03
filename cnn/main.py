@@ -42,13 +42,16 @@ for epoch in range(num_epochs):
 
 #testing the model with the validation set
 # todo: there is model.eval(), does that work that way? also 
-validation_dataset = MathSymbolsDateset(x_test, y_test, transform)
+validation_dataset = MathSymbolsDataset(x_test, y_test, transform)
 model.eval()
+count = 0
 with torch.no_grad():
     
-    for i in range(len(validation_datset)):
-        count = 0
+    for i in range(len(validation_dataset)):
+    
         for image, label in validation_dataset:
-            if model(image) == label:
+            outputs = model(image)
+            _, predicted = torch.max(outputs.data,1)
+            if predicted == label:
                 count= count +1
-print("your model got %d samples out of %d correct ", count, len(validation_dataset))
+print(f"your model got {count} samples out of {len(validation_dataset) correct ")
