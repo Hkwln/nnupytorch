@@ -46,12 +46,11 @@ validation_dataset = MathSymbolsDataset(x_test, y_test, transform)
 model.eval()
 count = 0
 with torch.no_grad():
-    
-    for i in range(len(validation_dataset)):
-    
         for image, label in validation_dataset:
+            #add batch dimension
+            image = image.unsqueeze(0)
             outputs = model(image)
-            _, predicted = torch.max(outputs.data,1).unsqueeze(0)
+            _, predicted = torch.max(outputs.data,1)
             if predicted == label:
                 count= count +1
 print(f"your model got {count} samples out of {len(validation_dataset)} correct ")
