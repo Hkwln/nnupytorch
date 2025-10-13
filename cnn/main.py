@@ -50,8 +50,8 @@ with torch.no_grad():
     for i in range(len(validation_dataset)):
     
         for image, label in validation_dataset:
-            outputs = model(image).unsqueeze(0) # adding a batch dim with the unsqueeze
-            _, predicted = torch.max(outputs.data,1)
+            outputs = model(image)
+            _, predicted = torch.max(outputs.data,1).unsqueeze(0)
             if predicted == label:
                 count= count +1
-print(f"your model got {count} samples out of {len(validation_dataset) correct ")
+print(f"your model got {count} samples out of {len(validation_dataset)} correct ")
