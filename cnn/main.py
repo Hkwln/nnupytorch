@@ -50,7 +50,7 @@ with torch.no_grad():
     for i in range(len(validation_dataset)):
     
         for image, label in validation_dataset:
-            outputs = model(image)
+            outputs = model(image).unsqueeze(0) # adding a batch dim with the unsqueeze
             _, predicted = torch.max(outputs.data,1)
             if predicted == label:
                 count= count +1
