@@ -4,6 +4,9 @@ from torchvision import transforms
 from model import simplecnn
 from datasethandler import MathSymbolsDataset
 from torch.utils.data import DataLoader
+import os
+current_dire = os.path.dirname(os.path.abspath(__file__))
+saved_model = os.path.join(current_dire,model.pt)
 #               data preperation
 ds = load_dataset("prithivMLmods/Math-symbols")
 # the dataset has a train vaidation and test batch
@@ -11,7 +14,9 @@ validation =ds["validation"]
 train = ds["train"]
 #shape of the dataset:
 x_train,y_train= train["image"], train["label"]
-x_test ,y_test = validation["image"], validation["label"]
+
+x_val, y_val= validation["image"], validation["label"]
+x_test ,y_test = train["image"], train["label"]
 
 #changing the jpeg into tensor and refactoring the dataset
 transform=  transforms.Compose([
@@ -20,6 +25,7 @@ transform=  transforms.Compose([
 ])
 
 train_dataset = MathSymbolsDataset(x_train, y_train, transform)
+validation_dataset = MathSymbolsDataset(x_val, y_val, transform)
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
 
@@ -38,15 +44,41 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+    #after a epoch, evaluate my model on the validation_dataset
+    #use torch.eval() and torch.no_grad()
+    # Calculate the validatioin loss and accuracy
+    model.eval() # go into validation mode
+    val_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for image, labels in validation_dataset:
+            out = model(image)
+            
+            
+            loss = loss_fn(predictions, labels)
+            val_loss = loss.item() *batch.size(0)
+            _, predictions = torch.max(out, 1)
+            #count the correct predictions
+
+            #update total number of samples
+
+    #average loss per samples
+
+    #total correct/total samples = accuracy
+    model.train()# go back into training mode
+
     
+#safe the the trained model inside a .pt format
+
 
 #testing the model with the validation set
 # todo: there is model.eval(), does that work that way? also 
-validation_dataset = MathSymbolsDataset(x_test, y_test, transform)
+train_dataset = MathSymbolsDataset(x_test, y_test, transform)
 model.eval()
 count = 0
 with torch.no_grad():
-        for image, label in validation_dataset:
+        for image, label in train_dataset:
             #add batch dimension
             image = image.unsqueeze(0)
             outputs = model(image)
