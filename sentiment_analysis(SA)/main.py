@@ -204,7 +204,7 @@ if not load_network:
         losses_train.append(train_loss)
         accuracies_train.append(train_accuracy)
         
-        # Compute loss and accuracy on the validation set
+        # Comtpute loss and accuracy on the validation set
         val_accuracy, val_loss = evaluate_model(model2, val_dataloader, loss_fn)
         losses_val.append(val_loss)
         accuracies_val.append(val_accuracy)

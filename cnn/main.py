@@ -6,7 +6,7 @@ from datasethandler import MathSymbolsDataset
 from torch.utils.data import DataLoader
 import os
 current_dire = os.path.dirname(os.path.abspath(__file__))
-saved_model = os.path.join(current_dire,model.pt)
+path = os.path.join(current_dire,"model.pt")
 #               data preperation
 ds = load_dataset("prithivMLmods/Math-symbols")
 # the dataset has a train vaidation and test batch
@@ -27,6 +27,7 @@ transform=  transforms.Compose([
 train_dataset = MathSymbolsDataset(x_train, y_train, transform)
 validation_dataset = MathSymbolsDataset(x_val, y_val, transform)
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+val_loader= DataLoader(validation_dataset, batch_size=32, shuffle=True)
 
 
 model = simplecnn()
@@ -52,31 +53,40 @@ for epoch in range(num_epochs):
     correct = 0
     total = 0
     with torch.no_grad():
-        for image, labels in validation_dataset:
+        for image, labels in val_loader:
             out = model(image)
             
             
-            loss = loss_fn(predictions, labels)
-            val_loss = loss.item() *batch.size(0)
+            loss = loss_fn(out, labels)
+            val_loss = loss.item() *labels.size(0)
             _, predictions = torch.max(out, 1)
             #count the correct predictions
-
+            #if predictions == label:correct=correct+1
+            correct += (predictions == labels).sum().item() 
             #update total number of samples
+            total += labels.size(0)
 
-    #average loss per samples
+    # loss per samples
+    val_loss = val_loss/total
 
     #total correct/total samples = accuracy
+    val_accuracy = correct/total
+    print(f"validation lost: {val_loss}, validation accuracy={val_accuracy}")
     model.train()# go back into training mode
 
     
 #safe the the trained model inside a .pt format
-
-
-#testing the model with the validation set
+current_state = {
+        "model_state dic": model.state_dict(),
+        "optimizer state dict" : optimizer.state_dict(),
+        "loss" : loss,
+        }  
+torch.save(current_state, path )
+#testing the codel with the validation set
 # todo: there is model.eval(), does that work that way? also 
 train_dataset = MathSymbolsDataset(x_test, y_test, transform)
 model.eval()
-count = 0
+count: int = 0
 with torch.no_grad():
         for image, label in train_dataset:
             #add batch dimension
@@ -84,5 +94,5 @@ with torch.no_grad():
             outputs = model(image)
             _, predicted = torch.max(outputs.data,1)
             if predicted == label:
-                count= count +1
-print(f"your model got {count} samples out of {len(validation_dataset)} correct ")
+                count = count+1
+print(f"your model got {count} samples out of {len(train_dataset)} correct ")
