@@ -5,7 +5,10 @@ from model import simplecnn
 from datasethandler import MathSymbolsDataset
 from torch.utils.data import DataLoader
 import os
-from tensorboard import SummaryWriter
+from tensorboardX import SummaryWriter
+
+
+
 current_dire = os.path.dirname(os.path.abspath(__file__))
 path = os.path.join(current_dire,"model.pt")
 #               data preperation
@@ -48,7 +51,7 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        writer.add_scalar('loss', loss, counter)
+        writer.add_scalar('loss', loss.item(), counter)
     #after a epoch, evaluate my model on the validation_dataset
     #use torch.eval() and torch.no_grad()
     # Calculate the validatioin loss and accuracy
@@ -62,8 +65,6 @@ for epoch in range(num_epochs):
             out = model(image)
             counter +=1
             
-            writer.add_scalar('validation', val_accuracy, counter)
-            writer.add_scalar('validation loss', val_loss, counter)
             loss = loss_fn(out, labels)
             val_loss = loss.item() *labels.size(0)
             _, predictions = torch.max(out, 1)
@@ -73,17 +74,18 @@ for epoch in range(num_epochs):
             #update total number of samples
             total += labels.size(0)
 
-    # loss per samples
-    val_loss = val_loss/total
-
-    #total correct/total samples = accuracy
+        
     val_accuracy = correct/total
+    val_loss = val_loss/total
+    writer.add_scalar('validation loss', val_loss, epoch)
+    writer.add_scalar('validation', val_accuracy, epoch)
+
     print(f"validation lost: {val_loss}, validation accuracy={val_accuracy}")
     #logging validation metrics, val accuracy, val loss
     model.train()# go back into training mode
     # every few epochs store params in histogram:
-    for name, param in model.parameters():
-        writer.add_histogram('model_state', param.data().cpu().numpy(), epoch)
+    for name, param in model.named_parameters():
+        writer.add_histogram('model_state', param.detach().cpu().numpy(), epoch)
 writer.close()
     
 #safe the the trained model inside a .pt format
