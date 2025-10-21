@@ -33,7 +33,6 @@ decode = lambda a: ''.join([int_to_char[i] for i in a])
 
 #preparing the data for the model
 data = torch.tensor(encode(all_text), dtype=torch.int64)
-
 # 85% of the data is used for training, rest for testing
 n = int(0.85 * len(data))
 train_data = data[:n]
