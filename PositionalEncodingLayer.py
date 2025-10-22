@@ -1,22 +1,27 @@
 import numpy as np
 import torch 
+import math
 # learned positional embeddings
 # then sinusodial positional encoding(paper)
 # add input to the embeddings, embeddings = embeddings+ positional encoding
 class PositionalEncoding(nn.Module):
-    __init__(self, seq_len, d):
+    def __init__(self, seq_len, d, drop_prob: float=0.0):
         super().__init__()
         self.seq_len = seq_len
         self.d = d
+        self.base = float(base)
+        self.batch_first = batch_first
+        self.dropout = torch.nn.Dropout(drop_prob)
         #precompute positional encoding once and register as buffer
-        p = torch.zeros(seq_len, d)
+        pe = torch.zeros(seq_len, d)
         position = torch.arange(0, seq_len, 1, dtype=torch.float32).unsqueeze(1)
-        div_term = torch.exp(-ln(10000)*2*position/d)
+        dim = torch.arange(0, d,dtype=torch.float32)
+        div_term = torch.exp(-torch.log(10000)*2*dim/d)
         #for even numbers:
-        p[:,0::2]= sin(position * div_term)
+        pe[:,0::2]= torch.sin(position * div_term)
         #for odd numbers:
-        p[:,1::3] = cos(postion * div_term)
-        self.register_buffer("p", p)
+        pe[:,1::2] = torch.cos(postion * div_term)
+        self.register_buffer("pe", pe)
 
     def forward(self, x: torch.tensor) -> torch.tensor:
             # expected shape: (batch, seq_len, d) when batch_first=True
