@@ -8,6 +8,7 @@
 
 ## plan:
 - build a cnn which recognizes every character
+  - dataset: iam database, synthText
 - make inputing more than one char possible so that it can translate simple senteces correctly
 - build a neural network that basically works like a spell checker
   - spell checker more sure than the cnn, change the char

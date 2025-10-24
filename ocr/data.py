@@ -1,5 +1,5 @@
-import torch
 from datasets import load_dataset
+from torchvision import transforms
 # use iam handwritten dataset for training
 ds = load_dataset("Teklia/IAM-line")
 
@@ -11,3 +11,9 @@ test = ds["test"]
 print(train)
 
 x_train, y_train = train["image"], train["label"]
+
+
+transfomr = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,),(0.5,))
+])
