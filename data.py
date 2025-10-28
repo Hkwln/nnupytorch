@@ -5,7 +5,6 @@ from torch.nn import functional as F
 import os
 import numpy as np
 
-
 dataset_folder = os.path.join(os.getcwd(), 'dataset')
 all_files = os.listdir(dataset_folder)
 
@@ -46,7 +45,7 @@ y = train_data[1:block_size+1]
 for t in range(block_size):
     context = x[:t+1]
     target = y[t]
-    print(f"when input is{context} the target:{target}")
+#    print(f"when input is{context} the target:{target}")
 
 
 batch_size = 4
@@ -60,15 +59,16 @@ def get_batch(split):
     return x, y
 
 xb, yb = get_batch('train')
-print('inputs:')
-print(xb.shape)
-print(xb)
-print('targets')
-print(yb.shape)
-print(yb)
+#print('inputs:')
+#print(xb.shape)
+#print(xb)
+#print('targets')
+#print(yb.shape)
+#print(yb)
 
-print('----')
+#print('----')
 
 for b in range(batch_size):
     for t in range(block_size):
         print(f"Batch {b}, Token {t}: input={xb[b, t]} target={yb[b, t]}")
+

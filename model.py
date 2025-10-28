@@ -20,7 +20,7 @@ class Transformermodel(torch.nn.Module):
         
         self.transformer = torch.nn.Transformer(d_model=dim_model, nhead=num_heads, num_encoder_layers=num_encoder_layers, num_decoder_layers= num_decoder,dropout=dropout_p)
         self.embedding = torch.nn.Embedding (vocab_size, embed_dim)
-        self.positionalEncoding = PositionalEncoding()
+        self.positionalEncoding = PositionalEncoding(vocab_size,embed_dim)
         self.linear = torch.nn.Linear(embed_dim, vocab_size)
         def forward(self, src, tgt, src_mask=None, tgt_mask=None):
             #embedding layer with a result of vectors shape:[batch_size, seq_lenm embedding_dim]
