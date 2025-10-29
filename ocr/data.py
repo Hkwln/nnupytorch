@@ -2,7 +2,7 @@ from datasets import load_dataset
 from torchvision import transforms
 # use iam handwritten dataset for training
 ds = load_dataset("Teklia/IAM-line")
-
+#Note that all images are resized to a fixed height of 128 pixels.
 print(ds)
 train = ds["train"]
 validation = ds["validation"]

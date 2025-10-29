@@ -5,6 +5,12 @@ Here I do simple excercises to get into pytorch
 How do you orientate here:
 The exciting folders are 
 - single layer neural network: here i experiment with only single layer neural network and discuss the usecase of such
+- cnn:
+  a simple cnn which recognizes some math symbols
+- transformer-based-nn:
+ not yet finished ---
+- ocr:
+  not yet finished ---
 - sentiment_analysis:
      here i coded a rnn which can give you the mood of a message: positive,negative,neutral
             imports.py just imports all packages
@@ -22,6 +28,7 @@ The exciting folders are
     Here is a cnn which which is still in progress, it should recognize simple math symbols like circle, kite,parallelogram, rectangle, rhombos, square, trapezoid, triangle.
 - Tests:
     Here is a cudacheck test to see if cuda works on your system and a model, which is a model blueprint that helped me
-
+- ohter:
+  Here you find some other experimentations about pytorch
     
 
