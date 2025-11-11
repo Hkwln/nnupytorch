@@ -14,7 +14,7 @@ class BiLstm(torch.nn.Modul):
         self.BiLstm_Layer = torch.nn.#?
         self.Dense_layer = torch.nn.Linear()
 
-    def forward(x),
+    def forward(x):
         b= self.pooling(torch.nn.functional.relu(self.convolutionlayer(x)))
         b = self.fc(b)
         out = b+x
